@@ -8,6 +8,7 @@ var cors = require('cors');
 var routes = require('./routes/index');
 var Users = require('./routes/Users');
 var Posts = require('./routes/Posts');
+var Comments = require('./routes/Comments');
 var app = express();
 
 // view engine setup
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/Users', Users);
 app.use('/Posts', Posts);
+app.use('/Comments', Comments);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

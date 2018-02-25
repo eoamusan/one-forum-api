@@ -28,7 +28,31 @@ router.get('/:id?', function(req, res, next) {
                 res.status(417);
                 res.send(response);
             } else {
-                var response = {"_meta":{"status_code": 200}, "data": rows};
+
+                for (i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    row.comments = [];
+
+                    if(row.comment_id){
+                        var comment =   {
+                                            id: row.comment_id,
+                                            text: row.comment_text,
+                                            userid: row.comment_userid,
+                                            postid: row.comment_postid,
+                                            created_at: row.comment_created_at
+                                        };
+
+                        row.comments[0] = comment;
+                    }
+
+                    delete row.comment_id;
+                    delete row.comment_text;
+                    delete row.comment_created_at;
+                    delete row.comment_userid;
+                    delete row.comment_postid;
+                }
+
+                var response = {"_meta":{"status_code": 200}, "data": formatArray(rows)};
 
                 res.status(200);
                 res.send(response);
@@ -37,6 +61,33 @@ router.get('/:id?', function(req, res, next) {
         });
     }
 });
+
+function formatArray(arr){
+    // console.log(arr);
+    var groups = {};
+
+    for (var i = 0; i < arr.length; i++) {
+        var groupName = arr[i].id;
+        groups[groupName] = arr[i];
+
+        if (!groups[groupName]) {
+            groups[groupName]['comments'] = [];
+        }
+
+        if(arr[i].comments.length !== 0){
+            groups[groupName]['comments'].push(arr[i].comments[0]);
+        }
+
+        console.log(groups);
+    }
+
+    arr = [];
+    for (var groupName in groups) {
+        arr.push(groups[groupName]);
+    }
+
+    return arr;
+}
 
 router.post('/', function(req, res, next) {
 
