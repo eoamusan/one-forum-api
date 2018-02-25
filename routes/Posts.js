@@ -1,27 +1,37 @@
 var express = require('express');
 var router = express.Router();
-var Task = require('../models/Post');
+var Post = require('../models/Post');
 
 router.get('/:id?', function(req, res, next) {
 
     if (req.params.id) {
 
-        Task.getPostByid(req.params.id, function(err, rows) {
+        Post.getPostByid(req.params.id, function(err, rows) {
             if (err) {
-                res.json(err);
+                var response = {"_meta":{"status_code": 404, "message": err}};
+
+                res.status(417);
+                res.send(response);
             } else {
-                res.json(rows);
+                var response = {"_meta":{"status_code": 200}, "data": rows};
+
+                res.status(200);
+                res.send(response);
             }
         });
     } else {
 
-        Task.getAllPosts(function(err, rows) {
-            console.log(err, rows);
-
+        Post.getAllPosts(function(err, rows) {
             if (err) {
-                res.json(err);
+                var response = {"_meta":{"status_code": 404, "message": err}};
+
+                res.status(417);
+                res.send(response);
             } else {
-                res.json(rows);
+                var response = {"_meta":{"status_code": 200}, "data": rows};
+
+                res.status(200);
+                res.send(response);
             }
 
         });
@@ -30,33 +40,39 @@ router.get('/:id?', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
 
-    Task.addPost(req.body, function(err, count) {
+    Post.addPost(req.body, function(err, result, fields) {
         if (err) {
-            res.json(err);
-        } else {
-            res.json(req.body);
-        }
-    });
-});
+            var response = {"_meta":{"status_code": 417, "message": err}};
 
-router.post('/:id', function(req, res, next) {
-    Task.deleteAll(req.body, function(err, count) {
-        if (err) {
-            res.json(err);
+            res.status(417);
+            res.send(response);
         } else {
-            res.json(count);
+            var data = req.body;
+            data.id = result.insertId;
+
+            var response = {"_meta":{"status_code": 200}, "data": data};
+
+            res.status(200);
+            res.send(response);
         }
     });
 });
 
 router.delete('/:id', function(req, res, next) {
 
-    Task.deleteTask(req.params.id, function(err, count) {
+    Post.deletePost(req.params.id, function(err, count) {
 
         if (err) {
-            res.json(err);
+            var response = {"_meta":{"status_code": 417, "message": err}};
+
+            res.status(417);
+            res.send(response);
         } else {
-            res.json(count);
+
+            var response = {"_meta":{"status_code": 200}};
+
+            res.status(200);
+            res.send(response);
         }
 
     });
@@ -64,12 +80,20 @@ router.delete('/:id', function(req, res, next) {
 
 router.put('/:id', function(req, res, next) {
 
-    Task.updateTask(req.params.id, req.body, function(err, rows) {
+    Post.updatePost(req.params.id, req.body, function(err, rows) {
 
         if (err) {
-            res.json(err);
+            var response = {"_meta":{"status_code": 417, "message": err}};
+
+            res.status(417);
+            res.send(response);
         } else {
-            res.json(rows);
+            var data = req.body;
+
+            var response = {"_meta":{"status_code": 200}, "data": data};
+
+            res.status(200);
+            res.send(response);
         }
     });
 });
