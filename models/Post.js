@@ -6,7 +6,7 @@ var Post = {
         return db.query("SELECT posts.id, title, category, content, userid, name, email FROM posts INNER JOIN users ON posts.userid = users.id", callback);
     },
     getPostByid: function(id, callback) {
-        return db.query("SELECT * FROM posts WHERE id = ?", [id], callback);
+        return db.query("SELECT posts.id, title, category, content, userid, name, email FROM posts INNER JOIN users ON posts.userid = users.id WHERE posts.id = ?", [id], callback);
     },
     addPost: function(Post, callback) {
     	var dt = new Date();
